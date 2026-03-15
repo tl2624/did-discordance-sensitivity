@@ -25,7 +25,7 @@ using **macOS Sonoma 14.7.1**.
 
 The script **`install_packages.R`** uses the `remotes` package to install the exact versions of `rlang`, `dplyr`, `tidyr`, `purrr`, `stringr`, `tibble`, `ggplot2`, and `ggh4x` needed to reproduce the results.
 
-Approximate total runtime (after package installation): **~5–10 minutes**, dominated by the cluster-bootstrap in `04_analysis.R`.
+Approximate total runtime (after package installation): **~3 minutes and 20 seconds**, dominated by the cluster-bootstrap in `04_analysis.R`.
 
 ---
 
@@ -73,18 +73,18 @@ Approximate size: 18 KB.
 |---|---|
 | `electorald` | Electoral district name (character) |
 | `year` | Election year (numeric; `NA` for the collapsed "1977+" period) |
-| `period` | Ordered factor: `1961`, `1966`, `1970`, `1974`, `1977+` |
+| `npshare` | National Party vote share |
+| `leftshare` | Left/liberal vote share |
+| `rightshare` | Right-wing (HNP) vote share |
 | `mine` | `1` = district contains at least one gold mine; `0` otherwise |
 | `treat` | `1` = mining district × post-treatment period (1977+); `0` otherwise |
-| `rightshare` | Right-wing (HNP) vote share |
-| `leftshare` | Left/liberal vote share |
-| `npshare` | National Party vote share |
-| `rightshare_gain` | First difference of `rightshare` relative to the group mean in the prior period |
-| `leftshare_gain` | First difference of `leftshare` |
-| `npshare_gain` | First difference of `npshare` |
-
----
-
+| `period` | Election period (character): `"1961"`, `"1966"`, `"1970"`, `"1974"`, `"1977+"`; coerced to an ordered factor in the analysis scripts |
+| `lag_mean_npshare` | Group mean of `npshare` in the immediately preceding period; `NA` for 1961 (no prior period) |
+| `lag_mean_rightshare` | Group mean of `rightshare` in the immediately preceding period; `NA` for 1961 (no prior period) |
+| `lag_mean_leftshare` | Group mean of `leftshare` in the immediately preceding period; `NA` for 1961 (no prior period) |
+| `npshare_gain` | First difference of `npshare` relative to the group mean in the prior period; `NA` for 1961 (no prior period) |
+| `rightshare_gain` | First difference of `rightshare` relative to the group mean in the prior period; `NA` for 1961 (no prior period) |
+| `leftshare_gain` | First difference of `leftshare` relative to the group mean in the prior period; `NA` for 1961 (no prior period) |
 ## Code
 
 All scripts are in `code/` and must be run from the project root (not from within `code/`). They are sourced in order by `master.R`.
@@ -205,7 +205,7 @@ did-discordance-sensitivity/
 ## References
 
 
-Luke J. Keele, Dylan S. Small, Jesse Y. Hsu, and Colin B. Fogarty. Patterns of effects and sensitivity analysis for differences-in-differences. arXiv Preprint, https://arxiv.org/ pdf/1901.01869, February 2019.
+Luke J. Keele, Dylan S. Small, Jesse Y. Hsu, and Colin B. Fogarty. Patterns of effects and sensitivity analysis for differences-in-differences. arXiv Preprint, https://arxiv.org/pdf/1901.01869, February 2019.
 
 Paul R. Rosenbaum. Observation and Experiment: An Introduction to Causal Inference. Harvard University Press, Cambridge, MA, 2017.
 
