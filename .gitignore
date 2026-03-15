@@ -1,0 +1,27 @@
+# macOS metadata
+.DS_Store
+__MACOSX/
+
+# R session artifacts
+.Rhistory
+.RData
+.Rproj.user/
+
+# renv: track activate.R, settings.json, and renv.lock — ignore the library
+renv/library/
+renv/local/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.xdv
