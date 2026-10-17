@@ -34,15 +34,15 @@
 
 % For papers submitted for review, just fill in author names
 % For accepted papers, heading arguments are {volume}{year}{pages}{submitted}{published}{author-full-names}
-\heading{00}{2026}{36}{}{}{Thomas Leavitt}
+\heading{00}{2026}{34}{}{}{Thomas Leavitt}
 
 % Short headings should be running head and authors last names
 
 \ShortHeadings{Beyond Pretrends}{Leavitt}
 \firstpageno{1}
 
-% Keep [H] figures where they are in the text without stretching the vertical space
-% on the preceding page when a figure moves to the next page.
+% Leave any spare space at the bottom of a page instead of stretching the space
+% between paragraphs.
 \raggedbottom
 
 \begin{document}
@@ -224,7 +224,7 @@ These weights determine how much relative emphasis the analysis places on each v
 \section{Motivating an Alternative to Pretrends-based Approaches} \label{sec: motivation}
 
 To motivate an alternative to a pretrends-based sensitivity analysis, \Cref{fig: DID cases} below presents two stylized examples adapted from the two-period patterns in \citet{keeleetal2019} and \citet[][pp.~164--165]{rosenbaum2017} by adding a second pre-treatment period so that pretrends are exactly parallel.
-\begin{figure}[H]
+\begin{figure}[!htb]
 \includegraphics[width = \linewidth]{../output/figures/DID_cases_1_2_plot.pdf}
 \caption{Two stylized cases (columns), each showing trends for treated and control groups across three time periods: two pre-treatment periods and one post-treatment period. The $x$-axis is common to all panels and reflects the time dimension, while the $y$-axis represents the average of the outcome variable, with the scale of the outcome varying by row. In the top row, outcomes are plotted on their original scale; in the bottom row, outcomes are transformed into changes relative to the group's mean outcome in the immediately preceding period. %Solid lines with filled circles represent the treated group; dashed lines with hollow circles represent the control group.
 }
@@ -311,7 +311,7 @@ These weights in \eqref{eq: minimax weights I} produce the sensitivity model of
 Under this model, the error of the parallel trends imputation is bounded by a magnitude, $M \geq 0$, of the largest discordance across all groups and validation periods. This bound in \eqref{eq: minimax regret sens model I} is the central discordance-based sensitivity model proposed in this paper. Because every $\lambda_{g,v}$ is a function of observable group-period means, the model in \eqref{eq: minimax regret sens model I} can also be expressed within the general framework of \citet{rambachanroth2023}; what distinguishes the discordance-based model from their leading restrictions is the benchmark used to bound violations of parallel trends, not the framework.
 
 Returning now to the two stylized examples in \Cref{fig: DID cases}, the value of the sensitivity model in \eqref{eq: minimax regret sens model I} is clear. \Cref{fig: sens cases} below shows that, while both models yield identical sensitivity in Case 1, they diverge substantially in Case 2.
-\begin{figure}[H] 
+\begin{figure}[!htb] 
 \includegraphics[width = \linewidth]{../output/figures/sens_plot_cases.pdf}
 \caption{Sensitivity bounds for the two stylized cases in \Cref{fig: DID cases}, with columns representing the cases and rows indicating the sensitivity model. The $x$-axis shows values of the sensitivity parameter $M \in \{0, 0.5, 1, 1.5, 2\}$, and the $y$-axis shows the corresponding values of the \textrm{ATT}. Solid points represent the \textrm{ATT} under the parallel trends assumption. Vertical bars indicate the identified set for the \textrm{ATT} under violations of the parallel trends assumption bounded by $M$ times the largest discordance (top row) or by $M$ times the largest pre-period Difference-in-Trends (bottom row); where no bar is visible, the identified set is a single point. The $y$-axis of each column is centered on that case's \textrm{ATT} under the parallel trends assumption and spans the same range in both columns, so that the widths of the vertical bars are comparable across columns.}
 \label{fig: sens cases}
@@ -512,7 +512,7 @@ Likely in response to pressure from the mining industry, the apartheid regime al
 The data from \citet{wilse-samson2013} include $153$ electoral districts with right-wing vote share measured in elections both before and after the labor shock. Of these $153$ districts, $14$ contained at least one gold mine (and thus were directly exposed to the labor shock), while the remaining $139$ did not. The pre-period includes the 1961, 1966, 1970, and 1974 national parliamentary elections. The post-period is collapsed into a single time point, denoted as 1977+. The outcome --- right-wing vote share --- is the proportion of voters in a district who supported parties to the right of the ruling National Party (NP), such as the Herstigte Nasionale Party (HNP) and, after its formation in 1982, the Conservative Party (CP).
 
 \Cref{fig: wilse-samson I} below shows the trends in right-wing vote share for districts with and without mines before and after the labor shock.
-\begin{figure}[H]
+\begin{figure}[!htb]
 \includegraphics[width = \linewidth]{../output/figures/wilse-samson_plot.pdf}
 \caption{The average right-wing vote share in electoral districts with at least one gold mine (dashed line) and those without any gold mines (solid line). The top panel plots the average right-wing vote share on its original scale, while the bottom panel plots the detrended series, defined as each group's change in average right-wing vote share relative to the group's mean in the preceding election period. The $x$-axis shows national election years. The election years 1961, 1966, 1970, and 1974 are shown as distinct time points, while ``1977+'' represents the post-treatment election years (1977, 1981, and 1987). In the top panel, each point reflects the average right-wing vote share across all mining or non-mining districts for that election year. For ``1977+'', the value is computed by first averaging within each district across all post-treatment election years and then averaging these district-level means within each group. In the bottom panel, each point reflects the average detrended outcome, with detrending for ``1977+'' performed after first computing each district's average outcome across all post-treatment periods. The vertical gray line indicates the start of the treatment period for mining districts, beginning with the first election after 1974.}
 \label{fig: wilse-samson I}
@@ -530,7 +530,7 @@ This maximum discordance of approximately $0.15$ implies that the \textrm{ATT}'s
 I therefore draw on the ``intersection--union'' approach of \citet{bergerhsu1996}, which is known to produce valid, though often conservative, confidence intervals \citep[see][pp.~2262--2264, who document the conservativeness of this approach for bounds of the same form and propose a less conservative bootstrap]{yeetal2024}. In practice, I use the aforementioned district-level bootstrap procedure in which, for each bootstrap replication, I resample electoral districts with replacement and recompute both the DID estimator and the discordance for every group-period pair in $\mathcal{G} \times \mathcal{V}$ on the resulting resample. This yields a bootstrap distribution of the DID estimator and, for each group-period pair, a bootstrap distribution of discordance. For each pair, I then combine the bootstrap draws of the DID estimator and that pair's discordance to obtain bootstrap distributions for the corresponding lower and upper ATT bounds under the sensitivity model, from which I take the $\alpha/2$ and $1-\alpha/2$ quantiles. Finally, following the intersection–union logic of \citet{bergerhsu1996}, I combine these candidate intervals across all group-period pairs by taking the smallest lower endpoint and the largest upper endpoint. The resulting interval is the union of the intervals computed for the individual group-period pairs; \citet[][pp.~2262--2263]{yeetal2024} describe the same construction under the same name. The interval is valid, though conservative, because the interval computed for the pair that attains the maximal discordance in the population contains each endpoint of the identified set with probability at least $1 - \alpha/2$, and the union contains that interval; the union therefore covers the whole identified set for the \textrm{ATT}, and hence the \textrm{ATT} itself, with probability at least $1 - \alpha$, whichever pair attains the maximal discordance.
 
 \Cref{fig: wilse-samson sens} shows that the \textrm{ATT}'s estimated bounds under the discordance-based model are highly sensitive to deviations from $M = 0$. Confidence intervals are computed using a cluster bootstrap together with the aforementioned ``intersection--union'' method from \citet{bergerhsu1996}. For comparability, the confidence intervals for the pretrends-based model in \Cref{fig: wilse-samson sens comp} below are computed with the same procedure, applied to the pre-period Differences-in-Trends in place of the discordances, rather than with the conditional or hybrid procedures of \citet{rambachanroth2023}; the two panels of \Cref{fig: wilse-samson sens comp} therefore differ only in the sensitivity model.
-\begin{figure}[H]
+\begin{figure}[!htb]
 \includegraphics[width = \linewidth]{../output/figures/sens_analysis.pdf}
 \caption{Estimates of the \textrm{ATT} under increasing values of $M \geq 0$. The $x$-axis is the sensitivity parameter $M$, which bounds the violation of parallel trends by $M$ times the maximum discordance. For each value of $M$, the black point marks the DID point estimate of the \textrm{ATT}. The black lines show the sample-based identified set for the \textrm{ATT} under that value of $M$, while the gray lines show 95\% CIs constructed around the upper and lower bounds of the \textrm{ATT}.}
 \label{fig: wilse-samson sens}
@@ -539,7 +539,7 @@ I therefore draw on the ``intersection--union'' approach of \citet{bergerhsu1996
 
 Note that, as \Cref{fig: wilse-samson I} also shows, even though discordance is high, violations of parallel trends in the pre-period are small, with a maximum absolute difference of $0.03$. This combination of mild pre-period violations and substantial discordance indicates that, although conclusions may be sensitive under the discordance-based model, they are robust under the pretrends-based sensitivity model. \Cref{fig: wilse-samson sens comp} below shows the dramatically different conclusions one would draw depending on the sensitivity analysis model one uses.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \includegraphics[width = \linewidth]{../output/figures/sens_analysis_comp.pdf}
 \caption{Estimates of the \textrm{ATT} under increasing values of $M \geq 0$. Each panel corresponds to a different approach for bounding violations of the parallel trends assumption: one based on the discordance between the parallel trends imputation (the control group's post-period detrended mean) and the alternative imputations from each pre-treatment group-period (discordance-based model), and the other based on pre-treatment differences in trends (pretrends-based model). The $x$-axis is the parameter $M$, which controls the maximum allowed deviation from parallel trends under each approach. For each value of $M$, the black point marks the DID point estimate of the ATT. The black lines show the identified set for the \textrm{ATT} given that value of $M$, while the gray lines show 95\% CIs constructed around the upper and lower bounds of the \textrm{ATT}.}
 \label{fig: wilse-samson sens comp}
