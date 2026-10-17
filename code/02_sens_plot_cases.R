@@ -19,6 +19,7 @@ library(purrr)    # map_dfr
 library(tibble)   # tibble()
 library(stringr)  # str_detect()
 library(ggplot2)  # all plotting
+library(ggh4x)    # facet_grid2(), facetted_pos_scales(): one y-axis per column
 
 # -----------------------------------------------------------------------------
 # 1. Reconstruct the stylized outcome data
@@ -101,15 +102,21 @@ sensitivity_df <- gain_df |>
 #    For each M and each case, compute the upper and lower ATT bounds
 #    under both the pretrends-based and discordance-based models.
 #
-#    Benchmark: post-treatment gain under exact parallel trends = 10
-#    (i.e., the ATT point estimate when M = 0)
+#    Benchmark: each case's ATT under exact parallel trends, i.e. the treated
+#    group's post-treatment gain minus the control group's post-treatment gain
+#    (Case 1 = 30, Case 2 = 50; the ATT point estimate when M = 0)
 #
 #    The worst-case delta and error are taken across all cases/periods,
 #    making the calibration common across cases for comparability.
 # -----------------------------------------------------------------------------
 
 Ms <- c(0, 0.5, 1, 1.5, 2)   # sensitivity parameter grid
-standard_post_gain <- 10       # ATT under exact parallel trends
+# ATT under exact parallel trends, per case: the treated group's post-treatment gain
+# minus the control group's post-treatment gain (Case 1 = 30, Case 2 = 50, Case 3 = 30).
+# (Corrected at proof stage, October 2026: an earlier version hard-coded 10 for every case.)
+case_att <- gain_df |>
+  filter(Time == 3) |>
+  transmute(Case, standard_post_gain = Treated_gain - Control_gain)
 
 # Take the worst-case sensitivity quantity across all cases
 common_delta <- max(sensitivity_df$delta, na.rm = TRUE)  # pretrends benchmark
@@ -117,6 +124,7 @@ common_error <- max(sensitivity_df$error, na.rm = TRUE)  # discordance benchmark
 
 # For each M x case combination, form bounds for both models
 sensitivity_plot_data <- expand_grid(M = Ms, sensitivity_df) |>
+  left_join(case_att, by = "Case") |>
   mutate(
     post_gain = standard_post_gain,
 
@@ -173,6 +181,11 @@ x_limits <- c(min(plot_data$M) - 0.1, max(plot_data$M) + 0.1)
 #    (vertical bar) as M increases.
 # -----------------------------------------------------------------------------
 
+# ATT under parallel trends for each plotted case (centers of the per-column y-axes)
+att_case1 <- case_att$standard_post_gain[case_att$Case == "Case 1"]
+att_case2 <- case_att$standard_post_gain[case_att$Case == "Case 2"]
+stopifnot(att_case1 == 30, att_case2 == 50)
+
 p <- ggplot(data = plot_data) +
   # Identified set for ATT: vertical error bar spanning [lower, upper]
   geom_errorbar(
@@ -193,16 +206,18 @@ p <- ggplot(data = plot_data) +
     color     = "gray60",
     linewidth = 0.4
   ) +
-  # Facets: rows = model, columns = case
-  facet_grid(model ~ Case, scales = "fixed") +
+  # Facets: rows = model, columns = case.  Each column gets its own y-axis, centered on
+  # that case's ATT under parallel trends with the same 90-unit span, so the two cases sit
+  # on one horizontal line while the bar widths remain comparable across columns.
+  facet_grid2(model ~ Case, scales = "free_y", independent = "y") +
   scale_x_continuous(
     limits = x_limits,
     breaks = seq(0, 2, by = 0.5)
   ) +
-  scale_y_continuous(
-    limits = y_limits,
-    breaks = seq(-30, 50, by = 20)
-  ) +
+  facetted_pos_scales(y = list(
+    Case == "Case 1" ~ scale_y_continuous(limits = att_case1 + c(-45, 45), breaks = att_case1 + seq(-40, 40, by = 20)),
+    Case == "Case 2" ~ scale_y_continuous(limits = att_case2 + c(-45, 45), breaks = att_case2 + seq(-40, 40, by = 20))
+  )) +
   labs(x = "M", y = "ATT") +
   theme_minimal(base_size = 12) +
   theme(

@@ -31,13 +31,13 @@
 # VERIFIED MANUSCRIPT RESULTS (Section 5):
 #   ATT point estimate:          0.11
 #   Bootstrap SE:                0.02
-#   95% CI:                      [0.07, 0.15]
-#   Max discordance:             0.15  (exact: 0.147)
+#   95% CI:                      [0.06, 0.15]
+#   Max discordance:             0.15  (exact: 0.148)
 #   Max pretrend difference:     0.03
 #   Discordance changepoint (bounds):  M* = 0.71
-#   Discordance changepoint (CI):      M* = 0.48
-#   Pretrend changepoint (bounds):     M* = 3.22
-#   Pretrend changepoint (CI):         M* = 2.98
+#   Discordance changepoint (CI):      M* = 0.41
+#   Pretrend changepoint (bounds):     M* = 3.20
+#   Pretrend changepoint (CI):         M* = 1.93
 #
 # RUNTIME: ~5-10 minutes (10,000 bootstrap draws).
 #   Set R <- 1000 for a quick check run.
@@ -71,8 +71,24 @@ period_levels  <- c("1961", "1966", "1970", "1974", "1977+")
 collapsed_data <- collapsed_data |>
   mutate(period = factor(period, levels = period_levels, ordered = TRUE))
 
+# Keep only districts observed in at least one pre-treatment election (153 of the 167
+# districts in the panel).  The 14 districts that appear only in 1977+ have no pre-period
+# outcome and therefore contribute nothing to the DID or to any detrended quantity.
+# (Corrected at proof stage, October 2026.)
+districts_in_pre <- collapsed_data |>
+  filter(period != "1977+") |>
+  distinct(electorald)
+collapsed_data <- collapsed_data |>
+  semi_join(districts_in_pre, by = "electorald")
+
 # Unique cluster IDs for the cluster bootstrap (cluster = electoral district)
 clusters <- unique(collapsed_data$electorald)
+
+# Pre-split the panel by district so that a resample can carry duplicate districts: a
+# district drawn k times must appear k times in the bootstrap sample.  (Corrected at proof
+# stage, October 2026: an earlier version used filter(electorald %in% sampled_clusters),
+# which keeps each drawn district once and so understates the bootstrap variability.)
+cluster_data <- split(collapsed_data, collapsed_data$electorald)
 
 # Number of bootstrap replications
 R <- 10^4
@@ -96,13 +112,13 @@ DID_est <- DID_estimator(
 cat("DID point estimate:", round(DID_est, 2), "\n")  # expected: 0.11
 
 # Cluster bootstrap for SE and 95% percentile CI
-# Manuscript results: SE = 0.02, 95% CI = [0.07, 0.15]
+# Manuscript results: SE = 0.02, 95% CI = [0.06, 0.15]
 boot_dids <- rep(NA_real_, R)
 
 for (r in seq_len(R)) {
   # Sample electoral districts with replacement
   sampled_clusters <- sample(clusters, size = length(clusters), replace = TRUE)
-  boot_data        <- filter(collapsed_data, electorald %in% sampled_clusters)
+  boot_data        <- bind_rows(cluster_data[as.character(sampled_clusters)])  # k draws -> k copies
 
   boot_dids[r] <- DID_estimator(
     data           = boot_data,
@@ -118,7 +134,7 @@ for (r in seq_len(R)) {
 cat("Bootstrap SE:", round(sd(boot_dids), 2), "\n")        # expected: 0.02
 cat("95% CI: [",
     round(quantile(boot_dids, 0.025), 2), ",",
-    round(quantile(boot_dids, 0.975), 2), "]\n")           # expected: [0.07, 0.15]
+    round(quantile(boot_dids, 0.975), 2), "]\n")           # expected: [0.06, 0.15]
 
 # =============================================================================
 # SECTION 3: DISCORDANCE-BASED SENSITIVITY
@@ -153,10 +169,10 @@ for (j in seq_len(nrow(combo_grid))) {
   )
 }
 
-cat("Max discordance:", round(max(est_discords), 2), "\n")  # expected: 0.15 (exact: 0.147)
+cat("Max discordance:", round(max(est_discords), 2), "\n")  # expected: 0.15 (exact: 0.148)
 cat("Discordance-based ATT bounds at M=1: [",
     round(DID_est - max(est_discords), 2), ",",
-    round(DID_est + max(est_discords), 2), "]\n")           # expected: [-0.04, 0.26]
+    round(DID_est + max(est_discords), 2), "]\n")           # expected: [-0.04, 0.25]
 
 # =============================================================================
 # SECTION 4: PRETRENDS-BASED SENSITIVITY
@@ -200,7 +216,7 @@ set.seed(482045732)
 
 for (r in seq_len(R)) {
   sampled_clusters <- sample(clusters, size = length(clusters), replace = TRUE)
-  boot_data        <- filter(collapsed_data, electorald %in% sampled_clusters)
+  boot_data        <- bind_rows(cluster_data[as.character(sampled_clusters)])  # k draws -> k copies
 
   # Discordance: one estimate per group x pre-period combination
   for (j in seq_len(nrow(combo_grid))) {
@@ -224,7 +240,10 @@ for (r in seq_len(R)) {
       group_var      = mine,
       time_var       = period,
       pre_period     = pretrend_periods[j],
-      use_gain_score = TRUE   # compare gain scores directly in pre-periods
+      use_gain_score = FALSE  # recompute the pre-period difference in trends from levels within
+                              # each resample, exactly as for the point estimate above.
+                              # (Corrected at proof stage, October 2026: an earlier version
+                              # compared stored gain scores, which the resample does not update.)
     )
   }
 }
@@ -234,7 +253,7 @@ for (r in seq_len(R)) {
 # =============================================================================
 
 # ---- Discordance-based changepoints ----------------------------------------
-# Manuscript results: bounds M* = 0.71, CI M* = 0.48
+# Manuscript results: bounds M* = 0.71, CI M* = 0.41
 
 # Estimated: M at which sample bounds first include 0
 cp_bounds <- uniroot(changepoint_M, interval = c(0, 5),
@@ -251,10 +270,10 @@ cp_ci <- uniroot(changepoint_M, interval = c(0, 5),
 
 cat("Discordance-based changepoints:\n")
 cat("  Estimated M*:", round(cp_bounds, 2), "\n")  # expected: 0.71
-cat("  CI-based M*:        ", round(cp_ci, 2), "\n")       # expected: 0.48
+cat("  CI-based M*:        ", round(cp_ci, 2), "\n")       # expected: 0.41
 
 # ---- Pretrends-based changepoints ------------------------------------------
-# Manuscript results: bounds M* = 3.22, CI M* = 2.98
+# Manuscript results: bounds M* = 3.20, CI M* = 1.93
 
 cp_bounds_pt <- uniroot(changepoint_M, interval = c(0, 6),
                         DID_est      = DID_est,
@@ -268,8 +287,8 @@ cp_ci_pt <- uniroot(changepoint_M, interval = c(0, 5),
                     type              = "ci")$root
 
 cat("Pretrends-based changepoints:\n")
-cat("  Estimated M*:", round(cp_bounds_pt, 2), "\n")  # expected: 3.22
-cat("  CI-based M*:        ", round(cp_ci_pt, 2), "\n")       # expected: 2.98
+cat("  Estimated M*:", round(cp_bounds_pt, 2), "\n")  # expected: 3.20
+cat("  CI-based M*:        ", round(cp_ci_pt, 2), "\n")       # expected: 1.93
 
 # =============================================================================
 # SECTION 7: BUILD PLOT DATA

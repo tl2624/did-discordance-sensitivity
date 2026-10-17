@@ -135,13 +135,13 @@ The key numerical results verified against the manuscript are printed to the con
 |---|---|
 | ATT point estimate | 0.11 |
 | Bootstrap SE | 0.02 |
-| 95% CI | [0.07, 0.15] |
-| Max discordance | 0.15 (exact: 0.147) |
+| 95% CI | [0.06, 0.15] |
+| Max discordance | 0.15 (exact: 0.148) |
 | Max pretrend difference | 0.03 |
 | Discordance changepoint, estimate | $M^* = 0.71$ |
-| Discordance changepoint, CI-based | $M^* = 0.48$ |
-| Pretrend changepoint, estimate | $M^* = 3.22$ |
-| Pretrend changepoint, CI-based | $M^* = 2.98$ |
+| Discordance changepoint, CI-based | $M^* = 0.41$ |
+| Pretrend changepoint, estimate | $M^* = 3.20$ |
+| Pretrend changepoint, CI-based | $M^* = 1.93$ |
 
 ---
 
@@ -202,8 +202,18 @@ did-discordance-sensitivity/
 
 ---
 
-## References
+## Revision history
 
+**October 2026 (page-proof stage).** Four corrections were made to the code while checking the proofs, and the manuscript's numbers and figures were updated to match:
+
+1. `04_analysis.R`: the cluster bootstrap now carries duplicate districts (a district drawn *k* times appears *k* times); the earlier `filter(electorald %in% sampled_clusters)` kept each drawn district once.
+2. `04_analysis.R`: the bootstrap for the pretrend violations recomputes the pre-period difference in trends from outcome levels within each resample (`use_gain_score = FALSE`), as the point estimate does; the earlier version compared stored gain scores that the resample did not update.
+3. `03_figures.R` and `04_analysis.R`: the 14 districts that appear only in the 1977+ period are dropped before any computation (153 districts remain); they have no pre-period outcome and contributed nothing to the DID.
+4. `02_sens_plot_cases.R`: the benchmark ATT for the stylized cases is computed per case (30 for Case 1, 50 for Case 2) instead of a hard-coded 10, and each column of Figure 2 has its own y-axis centered on that case's ATT with a common span.
+
+The numbers in the table above and in the figures reflect these corrections (previously: 95% CI [0.07, 0.15], maximum discordance 0.147, CI-based changepoints 0.48 and 2.98, bounds-based pretrend changepoint 3.22).
+
+## References
 
 Luke J. Keele, Dylan S. Small, Jesse Y. Hsu, and Colin B. Fogarty. Patterns of effects and sensitivity analysis for differences-in-differences. arXiv Preprint, https://arxiv.org/pdf/1901.01869, February 2019.
 
