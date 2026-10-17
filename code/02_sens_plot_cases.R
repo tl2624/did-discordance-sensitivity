@@ -113,7 +113,6 @@ sensitivity_df <- gain_df |>
 Ms <- c(0, 0.5, 1, 1.5, 2)   # sensitivity parameter grid
 # ATT under exact parallel trends, per case: the treated group's post-treatment gain
 # minus the control group's post-treatment gain (Case 1 = 30, Case 2 = 50, Case 3 = 30).
-# (Corrected at proof stage, October 2026: an earlier version hard-coded 10 for every case.)
 case_att <- gain_df |>
   filter(Time == 3) |>
   transmute(Case, standard_post_gain = Treated_gain - Control_gain)

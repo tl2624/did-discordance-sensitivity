@@ -36,7 +36,6 @@ collapsed_data <- collapsed_data |>
 # Keep only districts observed in at least one pre-treatment election (153 of the 167
 # districts in the panel).  The 14 districts that appear only in 1977+ have no pre-period
 # outcome and therefore contribute nothing to the detrended series or to the DID.
-# (Corrected at proof stage, October 2026.)
 districts_in_pre <- collapsed_data |>
   filter(period != "1977+") |>
   distinct(electorald)

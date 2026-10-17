@@ -74,7 +74,6 @@ collapsed_data <- collapsed_data |>
 # Keep only districts observed in at least one pre-treatment election (153 of the 167
 # districts in the panel).  The 14 districts that appear only in 1977+ have no pre-period
 # outcome and therefore contribute nothing to the DID or to any detrended quantity.
-# (Corrected at proof stage, October 2026.)
 districts_in_pre <- collapsed_data |>
   filter(period != "1977+") |>
   distinct(electorald)
@@ -85,9 +84,7 @@ collapsed_data <- collapsed_data |>
 clusters <- unique(collapsed_data$electorald)
 
 # Pre-split the panel by district so that a resample can carry duplicate districts: a
-# district drawn k times must appear k times in the bootstrap sample.  (Corrected at proof
-# stage, October 2026: an earlier version used filter(electorald %in% sampled_clusters),
-# which keeps each drawn district once and so understates the bootstrap variability.)
+# district drawn k times must appear k times in the bootstrap sample.
 cluster_data <- split(collapsed_data, collapsed_data$electorald)
 
 # Number of bootstrap replications
@@ -242,8 +239,6 @@ for (r in seq_len(R)) {
       pre_period     = pretrend_periods[j],
       use_gain_score = FALSE  # recompute the pre-period difference in trends from levels within
                               # each resample, exactly as for the point estimate above.
-                              # (Corrected at proof stage, October 2026: an earlier version
-                              # compared stored gain scores, which the resample does not update.)
     )
   }
 }

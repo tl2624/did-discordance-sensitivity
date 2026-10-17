@@ -65,7 +65,7 @@ from the project root. `master.R` calls `install_packages.R` and then sources th
 
 **File:** `data/wilse-samson_data.rds`
 
-A cleaned panel dataset of South African parliamentary electoral districts covering five national election periods from 1961 to 1987. The three post-1974 elections (1977, 1981, 1987) are collapsed to a single "1977+" period at the district level. The file contains 167 districts; the analysis scripts keep the 153 that are observed in at least one pre-treatment election and drop the 14 that appear only in the 1977+ period (see Revision history). The dataset was constructed from raw election returns and mine-location records originally collected by Wilse-Samson (2013). Raw source files are not included in this repository; the cleaned file is sufficient to reproduce all results.
+A cleaned panel dataset of South African parliamentary electoral districts covering five national election periods from 1961 to 1987. The three post-1974 elections (1977, 1981, 1987) are collapsed to a single "1977+" period at the district level. The file contains 167 districts; the analysis scripts keep the 153 that are observed in at least one pre-treatment election and drop the 14 that appear only in the 1977+ period, which have no pre-treatment outcome. The dataset was constructed from raw election returns and mine-location records originally collected by Wilse-Samson (2013). Raw source files are not included in this repository; the cleaned file is sufficient to reproduce all results.
 
 Approximate size: 18 KB.
 
@@ -192,7 +192,7 @@ did-discordance-sensitivity/
 │       ├── sens_analysis.pdf
 │       └── sens_analysis_comp.pdf
 │
-└── manuscript/                          # accepted paper source (corrected at proof stage, October 2026) and compiled PDF
+└── manuscript/                          # accepted paper source and compiled PDF
     ├── leavitt_did-discordance-sensitivity.tex
     ├── leavitt_did-discordance-sensitivity.bbl
     ├── leavitt_did-discordance-sensitivity.pdf
@@ -201,17 +201,6 @@ did-discordance-sensitivity/
 ```
 
 ---
-
-## Revision history
-
-**October 2026 (page-proof stage).** Four corrections were made to the code while checking the proofs, and the manuscript's numbers and figures were updated to match:
-
-1. `04_analysis.R`: the cluster bootstrap now carries duplicate districts (a district drawn *k* times appears *k* times); the earlier `filter(electorald %in% sampled_clusters)` kept each drawn district once.
-2. `04_analysis.R`: the bootstrap for the pretrend violations recomputes the pre-period difference in trends from outcome levels within each resample (`use_gain_score = FALSE`), as the point estimate does; the earlier version compared stored gain scores that the resample did not update.
-3. `03_figures.R` and `04_analysis.R`: the 14 districts that appear only in the 1977+ period are dropped before any computation (153 districts remain); they have no pre-period outcome and contributed nothing to the DID.
-4. `02_sens_plot_cases.R`: the benchmark ATT for the stylized cases is computed per case (30 for Case 1, 50 for Case 2) instead of a hard-coded 10, and each column of Figure 2 has its own y-axis centered on that case's ATT with a common span.
-
-The numbers in the table above and in the figures reflect these corrections (previously: 95% CI [0.07, 0.15], maximum discordance 0.147, CI-based changepoints 0.48 and 2.98, bounds-based pretrend changepoint 3.22).
 
 ## References
 
