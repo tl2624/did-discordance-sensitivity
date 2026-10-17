@@ -27,8 +27,8 @@
 #   01_DID_cases.R:        ~ 1 second
 #   02_sens_plot_cases.R:  ~ 0.33 seconds
 #   03_figures.R:          ~ 0.13 seconds
-#   04_analysis.R:         ~ 2 minutes and 13 seconds (10,000 bootstrap replications)
-#   Total (after install): ~ 2 minutes and 14 seconds
+#   04_analysis.R:         ~ 4 minutes (two cluster bootstraps, 10,000 replications each)
+#   Total (after install): ~ 4 minutes
 # =============================================================================
 
 ## Clear the R environment

@@ -25,7 +25,7 @@ using **macOS Sonoma 14.7.1**.
 
 The script **`install_packages.R`** uses the `remotes` package to install the exact versions of `rlang`, `dplyr`, `tidyr`, `purrr`, `stringr`, `tibble`, `ggplot2`, and `ggh4x` needed to reproduce the results.
 
-Approximate total runtime (after package installation): **~3 minutes and 20 seconds**, dominated by the cluster-bootstrap in `04_analysis.R`.
+Approximate total runtime (after package installation): **~4 minutes**, dominated by the two cluster bootstraps in `04_analysis.R` (10,000 replications each).
 
 ---
 
@@ -65,7 +65,7 @@ from the project root. `master.R` calls `install_packages.R` and then sources th
 
 **File:** `data/wilse-samson_data.rds`
 
-A cleaned panel dataset of South African parliamentary electoral districts covering five national election periods from 1961 to 1987. The three post-1974 elections (1977, 1981, 1987) are collapsed to a single "1977+" period at the district level. The dataset was constructed from raw election returns and mine-location records originally collected by Wilse-Samson (2013). Raw source files are not included in this repository; the cleaned file is sufficient to reproduce all results.
+A cleaned panel dataset of South African parliamentary electoral districts covering five national election periods from 1961 to 1987. The three post-1974 elections (1977, 1981, 1987) are collapsed to a single "1977+" period at the district level. The file contains 167 districts; the analysis scripts keep the 153 that are observed in at least one pre-treatment election and drop the 14 that appear only in the 1977+ period (see Revision history). The dataset was constructed from raw election returns and mine-location records originally collected by Wilse-Samson (2013). Raw source files are not included in this repository; the cleaned file is sufficient to reproduce all results.
 
 Approximate size: 18 KB.
 
@@ -115,19 +115,19 @@ Implements `changepoint_M()` — locates the value of M at which ATT bounds (or 
 | `code/01_DID_cases.R` | Figure 1 | < 1 second |
 | `code/02_sens_plot_cases.R` | Figure 2 | < 1 second |
 | `code/03_figures.R` | Figure 3 | < 1 second |
-| `code/04_analysis.R` | Figures 4–5, all in-text numerical results | ~ 2 minutes and 13 seconds |
+| `code/04_analysis.R` | Figures 4–5, all in-text numerical results | ~ 4 minutes |
 
 **`01_DID_cases.R`**  
 Produces Figure 1. Illustrates the DID logic using two stylized cases (Cases 1 and 2) from Keele et al. (2019) and Rosenbaum (2017, pp. 164–165), displaying group-level trends on both the original scale and as gain scores across two pre-treatment periods and one post-treatment period.
 
 **`02_sens_plot_cases.R`**  
-Produces Figure 2. Compares pretrends-based and discordance-based identified sets for the ATT across values of the sensitivity parameter $M \in \{0, 0.5, 1, 1.5, 2\}$ for the two stylized cases.
+Produces Figure 2. Compares pretrends-based and discordance-based identified sets for the ATT across values of the sensitivity parameter $M \in \{0, 0.5, 1, 1.5, 2\}$ for the two stylized cases. Each column has its own $y$-axis, centered on that case's ATT under parallel trends (30 for Case 1, 50 for Case 2) with a common span, so the bar widths are comparable across columns.
 
 **`03_figures.R`**  
 Produces Figure 3. Plots average right-wing vote share trends for mining versus non-mining South African electoral districts, on both the original scale and as detrended (gain-score) series.
 
 **`04_analysis.R`**  
-Produces Figures 4–5 and all numerical results reported in Section 5. Sources each custom function individually from `code/custom_functions/`. Computes the DID point estimate and cluster-bootstrap CI; estimates discordance and pretrend-violation quantities; constructs ATT bounds and their bootstrap CIs via the intersection-union method; and computes sensitivity changepoint values of $M$ for both models. Uses $R = 10{,}000$ bootstrap replications by default. To run a quick check, set `R <- 1000` near the top of the script.
+Produces Figures 4–5 and all numerical results reported in Section 7 (the application). Sources each custom function individually from `code/custom_functions/`. Computes the DID point estimate and cluster-bootstrap CI; estimates discordance and pretrend-violation quantities; constructs ATT bounds and their bootstrap CIs via the intersection-union method; and computes sensitivity changepoint values of $M$ for both models. Uses $R = 10{,}000$ bootstrap replications by default. To run a quick check, set `R <- 1000` near the top of the script.
 
 The key numerical results verified against the manuscript are printed to the console upon completion:
 
@@ -192,7 +192,7 @@ did-discordance-sensitivity/
 │       ├── sens_analysis.pdf
 │       └── sens_analysis_comp.pdf
 │
-└── manuscript/                          # submitted paper source and compiled PDF
+└── manuscript/                          # accepted paper source (corrected at proof stage, October 2026) and compiled PDF
     ├── leavitt_did-discordance-sensitivity.tex
     ├── leavitt_did-discordance-sensitivity.bbl
     ├── leavitt_did-discordance-sensitivity.pdf
