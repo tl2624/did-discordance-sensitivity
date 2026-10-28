@@ -192,7 +192,7 @@ did-discordance-sensitivity/
 │       ├── sens_analysis.pdf
 │       └── sens_analysis_comp.pdf
 │
-└── manuscript/                          # accepted paper source and compiled PDF
+└── manuscript/                          # accepted paper source and the typeset PDF
     ├── leavitt_did-discordance-sensitivity.tex
     ├── leavitt_did-discordance-sensitivity.bbl
     ├── leavitt_did-discordance-sensitivity.pdf
